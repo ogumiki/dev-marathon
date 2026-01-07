@@ -1,22 +1,96 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>案件情報入力</title>
-    <!-- Bootstrap CSSの読み込み -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>顧客登録確認</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  >
 </head>
 <body>
-    <div class="container mt-5">
-        <!-- ここにHTMLを書く -->
-    </div>
-    <script type="module">
-        <!-- ここにJSを書く -->
-    </script>
-    <!-- BootstrapのJavaScriptの読み込み -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <div class="container mt-5">
+    <h2 class="mb-4">顧客登録確認</h2>
+
+    <table class="table table-bordered">
+      <tr>
+        <th>会社名</th>
+        <td id="v-companyName"></td>
+      </tr>
+      <tr>
+        <th>業種</th>
+        <td id="v-industry"></td>
+      </tr>
+      <tr>
+        <th>連絡先</th>
+        <td id="v-contact"></td>
+      </tr>
+      <tr>
+        <th>所在地</th>
+        <td id="v-location"></td>
+      </tr>
+    </table>
+
+    <button id="backBtn" class="btn btn-secondary">戻る</button>
+    <button id="submitBtn" class="btn btn-primary ml-2">登録する</button>
+  </div>
+
+  <script type="module">
+    import config from '../config.js';
+
+    // add.html から渡されたデータを取得
+    const data = JSON.parse(sessionStorage.getItem('customer_confirm') || 'null');
+
+    // 直接開かれた場合の対策
+    if (!data) {
+      alert('確認データがありません。入力画面に戻ります。');
+      location.href = './add.html';
+    }
+
+    // 画面に表示
+    document.getElementById('v-companyName').textContent = data.companyName;
+    document.getElementById('v-industry').textContent = data.industry;
+    document.getElementById('v-contact').textContent = data.contact;
+    document.getElementById('v-location').textContent = data.location;
+
+    // 戻るボタン
+    document.getElementById('backBtn').addEventListener('click', () => {
+      location.href = './add.html';
+    });
+
+    // 登録する（ここで初めてPOST）
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      try {
+        const res = await fetch(config.apiUrl + '/add-customer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: new URLSearchParams(data)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          sessionStorage.removeItem('customer_confirm');
+          alert('登録しました');
+          location.href = './list.html';
+        } else {
+          alert('登録に失敗しました');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('通信エラー');
+      }
+    });
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

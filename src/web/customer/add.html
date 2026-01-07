@@ -31,30 +31,26 @@
         </form>
     </div>
     <script type="module">
-        import config from '../config.js';
+  // ここではAPIを使わないので、configは不要
+  // import config from '../config.js';
 
-        document.getElementById('customer-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            fetch(config.apiUrl + '/add-customer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams([...formData])
-            }).then(response => response.json())
-              .then(data => {
-                if(data.success) {
-                    alert('顧客情報が正常に保存されました。');
-                    // フォームをリセット
-                    document.getElementById('customer-form').reset();
-                } else {
-                    alert('保存に失敗しました。');
-                }
-              })
-              .catch(error => console.error('Error:', error));
-        });
-    </script>
+  document.getElementById('customer-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const data = {
+      companyName: document.getElementById('companyName').value,
+      industry: document.getElementById('industry').value,
+      contact: document.getElementById('contact').value,
+      location: document.getElementById('location').value
+    };
+
+    // 確認画面で使うために一時保存
+    sessionStorage.setItem('customer_confirm', JSON.stringify(data));
+
+    // 確認画面へ移動
+    location.href = './add-confirm.html';
+  });
+</script>
     <!-- BootstrapのJavaScriptの読み込み -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
