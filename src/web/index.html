@@ -3,22 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ホーム画面</title>
+  <title>顧客管理システム - ホーム</title>
   <style>
     :root{
-      --bg:#ffffff;
+      --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       --text:#111827;
       --muted:#6b7280;
       --border:#e5e7eb;
-      --shadow: 0 10px 25px rgba(0,0,0,.08);
-      --radius:16px;
-      --accent:#2563eb;
+      --shadow: 0 20px 60px rgba(0,0,0,.15);
+      --card-shadow: 0 10px 40px rgba(0,0,0,.1);
+      --radius:20px;
+      --accent:#667eea;
+      --accent-light:#eef2ff;
     }
 
-    * { box-sizing: border-box; }
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body{
-      margin:0;
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -27,40 +32,119 @@
       align-items:center;
       justify-content:center;
       padding:32px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      top: -200px;
+      right: -200px;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      bottom: -150px;
+      left: -150px;
+      pointer-events: none;
     }
 
     .wrap{
-      width: min(900px, 100%);
+      width: min(1000px, 100%);
+      position: relative;
+      z-index: 1;
     }
 
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeInDown 0.6s ease;
+    }
+
+
     h1{
-      margin: 0 0 24px;
-      font-size: 32px;
+      font-size: 42px;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 2px 20px rgba(0,0,0,.2);
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: 16px;
+      margin-top: 8px;
+      font-weight: 400;
     }
 
     .grid{
       display:grid;
       grid-template-columns: repeat(2, 1fr);
-      gap:24px;
+      gap:32px;
+      animation: fadeInUp 0.6s ease 0.2s both;
     }
 
     @media (max-width: 700px){
       .grid{
         grid-template-columns: 1fr;
       }
+      h1 {
+        font-size: 32px;
+      }
     }
 
     .card{
-      border:1px solid var(--border);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding:24px;
-      background:#fff;
+      box-shadow: var(--card-shadow);
+      padding: 32px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(255,255,255,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent) 0%, #764ba2 100%);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .card:hover{
+      transform: translateY(-8px);
+      box-shadow: 0 25px 60px rgba(0,0,0,.2);
     }
 
     .card h2{
-      margin: 0 0 16px;
-      font-size: 18px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 20px;
     }
 
     .btn{
@@ -68,50 +152,113 @@
       align-items:center;
       justify-content:space-between;
       width:100%;
-      padding:16px 18px;
-      border-radius:14px;
+      padding: 20px 24px;
+      border-radius:16px;
       text-decoration:none;
-      font-weight:700;
-      color:var(--text);
-      border:1px solid var(--border);
-      background:#f9fafb;
-      transition: all .15s ease;
+      font-weight:600;
+      font-size: 16px;
+      color: var(--text);
+      background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+      border: 2px solid transparent;
+      transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
     }
 
     .btn:hover{
-      background:#ffffff;
-      border-color:#d1d5db;
-      transform: translateY(-1px);
+      background: #ffffff;
+      border-color: var(--accent);
+      transform: translateX(4px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
     }
 
     .left{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:16px;
     }
 
     .icon{
-      width:36px;
-      height:36px;
-      border-radius:12px;
+      width: 48px;
+      height: 48px;
+      border-radius:14px;
       display:grid;
       place-items:center;
-      font-size:18px;
-      background:#eef2ff;
+      font-size: 22px;
+      background: linear-gradient(135deg, var(--accent-light) 0%, #dbeafe 100%);
       color: var(--accent);
-      border:1px solid #dbeafe;
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover .icon {
+      transform: scale(1.1) rotate(5deg);
+      background: var(--accent);
+      color: white;
     }
 
     .arrow{
       color: var(--muted);
-      font-size:18px;
+      font-size: 20px;
+      font-weight: 700;
+      transition: all 0.3s ease;
     }
+
+    .btn:hover .arrow {
+      color: var(--accent);
+      transform: translateX(4px);
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+
+
+
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <h1>ホーム画面</h1>
+    <div class="header">
+      <h1>顧客管理システム</h1>
+      <p class="subtitle">Customer Management System</p>
+    </div>
 
     <div class="grid">
       <div class="card">
@@ -119,7 +266,7 @@
         <a class="btn" href="/customer/add.html">
           <span class="left">
             <span class="icon">＋</span>
-            顧客登録
+            <span>顧客登録</span>
           </span>
           <span class="arrow">→</span>
         </a>
@@ -129,13 +276,14 @@
         <h2>一覧・確認</h2>
         <a class="btn" href="/customer/list.html">
           <span class="left">
-            <span class="icon">≡</span>
-            顧客一覧
+            <span class="icon">📋</span>
+            <span>顧客一覧</span>
           </span>
           <span class="arrow">→</span>
         </a>
       </div>
     </div>
+
   </div>
 </body>
 </html>

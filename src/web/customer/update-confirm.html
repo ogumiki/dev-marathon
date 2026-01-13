@@ -3,17 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>案件情報入力</title>
+    <title>顧客情報更新確認</title>
     <!-- Bootstrap CSSの読み込み -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container mt-5">
-        <!-- ここにHTMLを書く -->
+        <h2 class="mb-4">以下の内容で更新してよろしいですか？</h2>
+        
+        <div class="card p-3 mb-4">
+            <div class="mb-2"><b>ID:</b> <span id="id"></span></div>
+            <div class="mb-2"><b>会社名:</b> <span id="companyName"></span></div>
+            <div class="mb-2"><b>業種:</b> <span id="industry"></span></div>
+            <div class="mb-2"><b>連絡先:</b> <span id="contact"></span></div>
+            <div class="mb-2"><b>所在地:</b> <span id="location"></span></div>
+        </div>
+
+        <div class="d-flex" style="gap: 8px;">
+            <button type="button" class="btn btn-secondary" id="backBtn">戻る</button>
+            <button type="button" class="btn btn-primary" id="submitBtn">更新する</button>
+        </div>
     </div>
+    
     <script type="module">
-        <!-- ここにJSを書く -->
+        import config from '../config.js';
+
+        // sessionStorageから取得
+        const stored = sessionStorage.getItem('customer_update');
+        if (!stored) {
+            alert('データが見つかりません');
+            location.href = './list.html';
+        }
+
+        const data = JSON.parse(stored);
+
+        // 確認画面に表示
+        document.getElementById('id').textContent = data.id;
+        document.getElementById('companyName').textContent = data.companyName;
+        document.getElementById('industry').textContent = data.industry;
+        document.getElementById('contact').textContent = data.contact;
+        document.getElementById('location').textContent = data.location;
+
+        // 戻るボタン
+        document.getElementById('backBtn').addEventListener('click', function() {
+            location.href = `update.html?id=${data.id}`;
+        });
+
+        // 更新ボタン
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            try {
+                const res = await fetch(`${config.apiUrl}/customers/${data.id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        company_name: data.companyName,
+                        industry: data.industry,
+                        contact: data.contact,
+                        location: data.location,
+                    }),
+                });
+
+                if (!res.ok) {
+                    const text = await res.text().catch(() => "");
+                    throw new Error(`PUT failed: ${res.status} ${text}`);
+                }
+
+                // sessionStorageをクリア
+                sessionStorage.removeItem('customer_update');
+
+                alert("更新しました");
+                location.href = `list.html`;
+            } catch (e) {
+                console.error(e);
+                alert("更新に失敗しました（Console / Network を確認）");
+            }
+        });
     </script>
+    
     <!-- BootstrapのJavaScriptの読み込み -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
