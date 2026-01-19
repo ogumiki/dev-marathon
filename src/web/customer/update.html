@@ -3,17 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>案件情報入力</title>
+    <title>顧客情報更新</title>
     <!-- Bootstrap CSSの読み込み -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container mt-5">
-        <!-- ここにHTMLを書く -->
+        <h2 class="mb-4">顧客情報を更新してください</h2>
+        <form id="customer-form">
+            <div class="form-group">
+                <label for="companyName">会社名:</label>
+                <input type="text" class="form-control" id="companyName" name="companyName" required>
+            </div>
+            <div class="form-group">
+                <label for="industry">業種:</label>
+                <input type="text" class="form-control" id="industry" name="industry" required>
+            </div>
+            <div class="form-group">
+                <label for="contact">連絡先:</label>
+                <input type="text" class="form-control" id="contact" name="contact" required>
+            </div>
+            <div class="form-group">
+                <label for="location">所在地:</label>
+                <input type="text" class="form-control" id="location" name="location" required>
+            </div>
+            <button type="submit" class="btn btn-primary">送信</button>
+        </form>
     </div>
+    
     <script type="module">
-        <!-- ここにJSを書く -->
+        import config from '../config.js';
+
+        const params = new URLSearchParams(location.search);
+        const id = params.get("id");
+
+        // idが無い場合は一覧へ
+        if (!id) {
+            alert("idが指定されていません");
+            location.href = "list.html";
+        }
+
+        // 既存データを取得してフォームに設定
+        fetch(`${config.apiUrl}/customers/${id}`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Not found");
+                return res.json();
+            })
+            .then((customer) => {
+                document.getElementById('companyName').value = customer.company_name ?? "";
+                document.getElementById('industry').value = customer.industry ?? "";
+                document.getElementById('contact').value = customer.contact ?? "";
+                document.getElementById('location').value = customer.location ?? "";
+            })
+            .catch((err) => {
+                console.error(err);
+                alert("顧客データの取得に失敗しました");
+                location.href = "list.html";
+            });
+
+        // フォーム送信
+        document.getElementById('customer-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const data = {
+                id: id,
+                companyName: document.getElementById('companyName').value,
+                industry: document.getElementById('industry').value,
+                contact: document.getElementById('contact').value,
+                location: document.getElementById('location').value
+            };
+
+            // 確認画面で使うために一時保存
+            sessionStorage.setItem('customer_update', JSON.stringify(data));
+
+            // 確認画面へ移動
+            location.href = './update-confirm.html';
+        });
     </script>
+    
     <!-- BootstrapのJavaScriptの読み込み -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
